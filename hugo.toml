@@ -1,0 +1,4 @@
+baseURL = 'https://snider-dev.github.io'
+locale = 'en-us'
+title = "Thomas Schneider's Blog"
+theme = 'stack'
