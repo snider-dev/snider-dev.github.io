@@ -95,16 +95,16 @@
       "name": "\"How do I use my real Chrome profile with Claude Code's Playwright MCP?\"",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "\"Install the Playwright MCP Bridge Chrome extension, store the PLAYWRIGHT_MCP_EXTENSION_TOKEN in your shell environment, then open the browser with --browser=chrome --extension --headed. Playwright connects to your already-running Chrome over CDP.\""
+        "text": "\"Install the Playwright MCP Bridge Chrome extension, make sure Chrome is already running, then open the browser with --browser=chrome --extension --headed. Playwright connects to your already-running Chrome over CDP. You'll see an approval dialog on each Chrome restart.\""
       }
     }
     ,
     {
       "@type": "Question",
-      "name": "\"Does the Playwright MCP extension token change?\"",
+      "name": "\"Does the Playwright MCP extension need re-approval after Chrome restarts?\"",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "\"Yes. The token resets every time Chrome restarts. You'll see a connection dialog with the new token. Click Allow \\u0026 select, then update PLAYWRIGHT_MCP_EXTENSION_TOKEN in your ~/.zshrc.\""
+        "text": "\"Yes. Each time Chrome restarts you'll see a dialog asking you to approve the connection. Just click Allow \\u0026 select on the tab you want to automate and you're good to go.\""
       }
     }
     ,
@@ -350,22 +350,18 @@
 </h2><p>The Playwright MCP Bridge extension connects Playwright to your already-running Chrome over CDP. Same browser you use every day, same cookies, same sessions. Everything you&rsquo;re logged into just works.</p>
 <p><strong>Step 1: Install the extension</strong></p>
 <p>Search &ldquo;Playwright Extension&rdquo; in the Chrome Web Store. The ID is <code>mmlmfjhmonkocbjadbfplnigmagldckm</code> if you want to go directly.</p>
-<p><strong>Step 2: Store your token</strong></p>
-<p>Click the extension icon after installing. It gives you a token to set as an environment variable. Add it to <code>~/.zshrc</code> (or <code>~/.bashrc</code>):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>export PLAYWRIGHT_MCP_EXTENSION_TOKEN<span style="color:#f92672">=</span>your-token-here
-</span></span></code></pre></div><p>Then <code>source ~/.zshrc</code>. The token is unique to your installation, so copy it from the extension rather than using a placeholder.</p>
-<p><strong>Step 3: Use &ndash;extension instead of &ndash;profile</strong></p>
+<p><strong>Step 2: Use &ndash;extension instead of &ndash;profile</strong></p>
 <p>Chrome needs to already be running. Then:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>playwright-cli open --browser<span style="color:#f92672">=</span>chrome --extension --headed https://example.com
 </span></span></code></pre></div><p>That&rsquo;s it. Playwright connects to your running browser and your login state is there.</p>
-<h2 id="one-gotcha-the-token-resets-on-restart">One gotcha: the token resets on restart
-</h2><p>Every time Chrome restarts, the token changes. You&rsquo;ll see a dialog like this pop up in Chrome:</p>
+<h2 id="approving-the-connection">Approving the connection
+</h2><p>The first time you run this, and every time Chrome restarts, you&rsquo;ll see a dialog:</p>
 
     <blockquote>
-        <p>&ldquo;playwright-cli is trying to connect to the Playwright Extension. Set this environment variable to bypass the connection dialog: PLAYWRIGHT_MCP_EXTENSION_TOKEN=&hellip;&rdquo;</p>
+        <p>&ldquo;playwright-cli is trying to connect to the Playwright Extension&rdquo;</p>
 
     </blockquote>
-<p>Click &ldquo;Allow &amp; select&rdquo; on the tab you want, copy the new token value, update <code>~/.zshrc</code>. It&rsquo;s a one-time thing per Chrome session. The re-approval is intentional since the extension has full access to your browser including everything you&rsquo;re signed into.</p>
+<p>Click <strong>Allow &amp; select</strong> on the tab you want to automate. That&rsquo;s the whole setup. The re-approval on restart is intentional — the extension has full access to your browser including everything you&rsquo;re signed into, so it asks each session.</p>
 <h2 id="using-this-for-web-research-in-claude-code">Using this for web research in Claude Code
 </h2><p>Once it&rsquo;s set up you can point Claude Code at ChatGPT, Gemini or Perplexity and have it do research there with your real session, rather than firing WebFetch at raw URLs and getting blocked.</p>
 <p>If you&rsquo;re using the <code>playwright-cli</code> skill in Claude Code, add this section to the top of your <code>~/.claude/skills/playwright-cli/SKILL.md</code> so Claude always knows to ask before opening a browser:</p>
@@ -378,7 +374,7 @@
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> Chrome must already be running — if not, tell the user to open it first
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> Always use <span style="color:#e6db74">`--browser=chrome --extension`</span> (never <span style="color:#e6db74">`--profile`</span>, it doesn&#39;t work)
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> Always use <span style="color:#e6db74">`--headed`</span> so the browser is visible
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> The token is in the environment as <span style="color:#e6db74">`PLAYWRIGHT_MCP_EXTENSION_TOKEN`</span> — no need to pass it manually
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> If the connection dialog appears in Chrome, tell the user to click Allow &amp; select
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>```bash
 </span></span><span style="display:flex;"><span>playwright-cli open --browser=chrome --extension --headed https://example.com

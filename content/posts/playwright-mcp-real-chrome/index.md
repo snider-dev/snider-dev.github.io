@@ -14,9 +14,9 @@ faq:
   - q: "Why doesn't --profile work with Playwright MCP in Claude Code?"
     a: "The --profile flag launches Playwright's own Chromium binary pointed at your profile directory. That binary doesn't share cookies or login state with your installed Chrome, so you're always unauthenticated regardless of the path you pass."
   - q: "How do I use my real Chrome profile with Claude Code's Playwright MCP?"
-    a: "Install the Playwright MCP Bridge Chrome extension, store the PLAYWRIGHT_MCP_EXTENSION_TOKEN in your shell environment, then open the browser with --browser=chrome --extension --headed. Playwright connects to your already-running Chrome over CDP."
-  - q: "Does the Playwright MCP extension token change?"
-    a: "Yes. The token resets every time Chrome restarts. You'll see a connection dialog with the new token. Click Allow & select, then update PLAYWRIGHT_MCP_EXTENSION_TOKEN in your ~/.zshrc."
+    a: "Install the Playwright MCP Bridge Chrome extension, make sure Chrome is already running, then open the browser with --browser=chrome --extension --headed. Playwright connects to your already-running Chrome over CDP. You'll see an approval dialog on each Chrome restart."
+  - q: "Does the Playwright MCP extension need re-approval after Chrome restarts?"
+    a: "Yes. Each time Chrome restarts you'll see a dialog asking you to approve the connection. Just click Allow & select on the tab you want to automate and you're good to go."
   - q: "How do I configure the playwright-cli Claude Code skill to use my real Chrome?"
     a: "Add a Profile mode section to the top of your ~/.claude/skills/playwright-cli/SKILL.md telling Claude to always ask whether to use your real Chrome before opening a browser, and to use --browser=chrome --extension --headed instead of --profile."
 ---
@@ -56,17 +56,7 @@ The Playwright MCP Bridge extension connects Playwright to your already-running 
 
 Search "Playwright Extension" in the Chrome Web Store. The ID is `mmlmfjhmonkocbjadbfplnigmagldckm` if you want to go directly.
 
-**Step 2: Store your token**
-
-Click the extension icon after installing. It gives you a token to set as an environment variable. Add it to `~/.zshrc` (or `~/.bashrc`):
-
-```bash
-export PLAYWRIGHT_MCP_EXTENSION_TOKEN=your-token-here
-```
-
-Then `source ~/.zshrc`. The token is unique to your installation, so copy it from the extension rather than using a placeholder.
-
-**Step 3: Use --extension instead of --profile**
+**Step 2: Use --extension instead of --profile**
 
 Chrome needs to already be running. Then:
 
@@ -76,13 +66,13 @@ playwright-cli open --browser=chrome --extension --headed https://example.com
 
 That's it. Playwright connects to your running browser and your login state is there.
 
-## One gotcha: the token resets on restart
+## Approving the connection
 
-Every time Chrome restarts, the token changes. You'll see a dialog like this pop up in Chrome:
+The first time you run this, and every time Chrome restarts, you'll see a dialog:
 
-> "playwright-cli is trying to connect to the Playwright Extension. Set this environment variable to bypass the connection dialog: PLAYWRIGHT_MCP_EXTENSION_TOKEN=..."
+> "playwright-cli is trying to connect to the Playwright Extension"
 
-Click "Allow & select" on the tab you want, copy the new token value, update `~/.zshrc`. It's a one-time thing per Chrome session. The re-approval is intentional since the extension has full access to your browser including everything you're signed into.
+Click **Allow & select** on the tab you want to automate. That's the whole setup. The re-approval on restart is intentional — the extension has full access to your browser including everything you're signed into, so it asks each session.
 
 ## Using this for web research in Claude Code
 
@@ -100,7 +90,7 @@ If the user wants their profile:
 - Chrome must already be running — if not, tell the user to open it first
 - Always use `--browser=chrome --extension` (never `--profile`, it doesn't work)
 - Always use `--headed` so the browser is visible
-- The token is in the environment as `PLAYWRIGHT_MCP_EXTENSION_TOKEN` — no need to pass it manually
+- If the connection dialog appears in Chrome, tell the user to click Allow & select
 
 ```bash
 playwright-cli open --browser=chrome --extension --headed https://example.com
