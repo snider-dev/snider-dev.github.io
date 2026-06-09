@@ -13,7 +13,7 @@ theme = 'stack'
     name  = "Thomas Schneider"
 
 [params.sidebar]
-    subtitle = "Tech Lead at SAP AI. Building production-grade AI agent infrastructure."
+    subtitle = "K8s enthusiast and tech lead at SAP AI."
 
 [params.analytics.google]
 measurementId = "G-WLY3QYQN8M"
