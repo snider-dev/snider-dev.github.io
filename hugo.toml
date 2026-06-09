@@ -7,14 +7,13 @@ title = "Thomas Schneider's Blog"
 theme = 'stack'
 
 [params]
-    favicon = "img/avatar.png"
+    mainSections = ["posts"]
 
 [params.author]
     name  = "Thomas Schneider"
 
 [params.sidebar]
     subtitle = "Tech Lead at SAP AI. Building production-grade AI agent infrastructure."
-    avatar   = "img/avatar.png"
 
 [params.analytics.google]
 measurementId = "G-WLY3QYQN8M"
