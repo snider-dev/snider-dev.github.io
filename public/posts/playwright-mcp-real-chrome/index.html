@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Claude Code's WebFetch gets 403'd on most sites. Here's how to use the Playwright MCP Bridge extension to give Claude Code a real browser session, your logged-in Chrome, for web research and automation.">
+<title>Claude Code &#43; Playwright MCP: Using Your Real Chrome Profile</title>
+
+
+<link rel="canonical" href="https://snider-dev.github.io/posts/playwright-mcp-real-chrome/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+
+
+<link rel="stylesheet" href="/scss/style.min.b732095129242e2cc6d53ba659f476b7da40a2c70e1928579884e0cb48466352.css"><meta property='og:title' content="Claude Code + Playwright MCP: Using Your Real Chrome Profile">
+<meta property='og:description' content="Claude Code's WebFetch gets 403'd on most sites. Here's how to use the Playwright MCP Bridge extension to give Claude Code a real browser session, your logged-in Chrome, for web research and automation.">
+<meta property='og:url' content='https://snider-dev.github.io/posts/playwright-mcp-real-chrome/'>
+<meta property='og:site_name' content='Thomas Schneider&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:tag' content='claude-code' /><meta property='article:tag' content='MCP' /><meta property='article:tag' content='playwright' /><meta property='article:tag' content='browser-automation' /><meta property='article:published_time' content='2026-06-09T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-06-09T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="Claude Code + Playwright MCP: Using Your Real Chrome Profile">
+<meta name="twitter:description" content="Claude Code's WebFetch gets 403'd on most sites. Here's how to use the Playwright MCP Bridge extension to give Claude Code a real browser session, your logged-in Chrome, for web research and automation.">
+    <link rel="shortcut icon" href="img/avatar.png" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Claude Code + Playwright MCP: Using Your Real Chrome Profile\"",
+  "description": "\"Claude Code's WebFetch gets 403'd on most sites. Here's how to use the Playwright MCP Bridge extension to give Claude Code a real browser session, your logged-in Chrome, for web research and automation.\"",
+  "url": "https:\/\/snider-dev.github.io\/posts\/playwright-mcp-real-chrome\/",
+  "datePublished": "2026-06-09T00:00:00Z",
+  "dateModified": "2026-06-09T00:00:00Z",
+  "author": {
+    "@type": "Person",
+    "name": "Thomas Schneider"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Thomas Schneider\u0027s Blog",
+    "url": "https:\/\/snider-dev.github.io\/"
+  }
+  
+}
+</script>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Thomas Schneider\u0027s Blog",
+      "item": "https:\/\/snider-dev.github.io\/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "\"Claude Code + Playwright MCP: Using Your Real Chrome Profile\"",
+      "item": "https:\/\/snider-dev.github.io\/posts\/playwright-mcp-real-chrome\/"
+    }
+  ]
+}
+</script>
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    
+    {
+      "@type": "Question",
+      "name": "\"Why does Claude Code get 403 errors when fetching URLs?\"",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "\"Claude Code's built-in WebFetch tool sends requests without a real browser session, so sites that check for browser fingerprints, cookies, or login state block it with a 403. The fix is to use Playwright MCP with your real Chrome browser instead.\""
+      }
+    }
+    ,
+    {
+      "@type": "Question",
+      "name": "\"Why doesn't --profile work with Playwright MCP in Claude Code?\"",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "\"The --profile flag launches Playwright's own Chromium binary pointed at your profile directory. That binary doesn't share cookies or login state with your installed Chrome, so you're always unauthenticated regardless of the path you pass.\""
+      }
+    }
+    ,
+    {
+      "@type": "Question",
+      "name": "\"How do I use my real Chrome profile with Claude Code's Playwright MCP?\"",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "\"Install the Playwright MCP Bridge Chrome extension, store the PLAYWRIGHT_MCP_EXTENSION_TOKEN in your shell environment, then open the browser with --browser=chrome --extension --headed. Playwright connects to your already-running Chrome over CDP.\""
+      }
+    }
+    ,
+    {
+      "@type": "Question",
+      "name": "\"Does the Playwright MCP extension token change?\"",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "\"Yes. The token resets every time Chrome restarts. You'll see a connection dialog with the new token. Click Allow \\u0026 select, then update PLAYWRIGHT_MCP_EXTENSION_TOKEN in your ~/.zshrc.\""
+      }
+    }
+    ,
+    {
+      "@type": "Question",
+      "name": "\"How do I configure the playwright-cli Claude Code skill to use my real Chrome?\"",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "\"Add a Profile mode section to the top of your ~/.claude/skills/playwright-cli/SKILL.md telling Claude to always ask whether to use your real Chrome before opening a browser, and to use --browser=chrome --extension --headed instead of --profile.\""
+      }
+    }
+    
+  ]
+}
+</script>
+
+
+
+
+
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="img/avatar.png" 
+                        width=""
+                        height=""
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Thomas Schneider&#39;s Blog</a></h1>
+            <h2 class="site-description">Tech Lead at SAP AI. Building production-grade AI agent infrastructure.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/schthms'
+                        
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.linkedin.com/in/thomas-schneider-24769313b/'
+                        
+                        title="LinkedIn"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://x.com/sndr_tms'
+                        
+                        title="X"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/posts/playwright-mcp-real-chrome/">Claude Code &#43; Playwright MCP: Using Your Real Chrome Profile</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            Claude Code&#39;s WebFetch gets 403&#39;d on most sites. Here&#39;s how to use the Playwright MCP Bridge extension to give Claude Code a real browser session, your logged-in Chrome, for web research and automation.
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    
+    
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-06-09T00:00:00Z'>Tuesday, June 9, 2026</time>
+                
+
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                    <time class="article-time--reading">
+                        4 minutes read
+                    </time>
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <p>If you use Claude Code for day-to-day development, you&rsquo;ve run into this. You ask it to pull up a doc, check a Reddit thread, or look at a GitHub issue, and it comes back with a 403. Or it fetches some stripped-down cached version that&rsquo;s missing the thing you actually needed.</p>
+<p><code>WebFetch</code> doesn&rsquo;t use a real browser. No cookies, no session, no JS rendering. A lot of the sites developers actually need hit it with a 403 or a login redirect.</p>
+<p>ChatGPT and Gemini have web search built in. Claude Code doesn&rsquo;t, at least not out of the box. But you can get pretty close by connecting Claude Code to your real Chrome via Playwright MCP. Here&rsquo;s how.</p>
+<h2 id="why-this-keeps-happening">Why this keeps happening
+</h2><p>When Claude Code fetches a URL it&rsquo;s sending a plain HTTP request. No browser fingerprint, no cookies, no rendered DOM. Sites see it as a bot and either block it (403), redirect to login, or throw a Cloudflare challenge.</p>
+<p>It&rsquo;s most annoying when you&rsquo;re:</p>
+<ul>
+<li>Integrating a new library and the actual docs are behind a JS render</li>
+<li>The answer to your bug is on a Reddit thread that needs login to view properly</li>
+<li>You want Claude Code to use Gemini&rsquo;s deep research or web search instead of fetching raw URLs</li>
+</ul>
+<p>The obvious fix looks like <code>playwright-cli open --profile</code>. It doesn&rsquo;t work, and it fails without telling you why.</p>
+<h2 id="whats-wrong-with-profile">What&rsquo;s wrong with &ndash;profile
+</h2><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>playwright-cli open --browser<span style="color:#f92672">=</span>chrome --profile<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/Users/you/Library/Application Support/Google/Chrome/Default&#34;</span>
+</span></span></code></pre></div><p>Looks fine. The path is right. But Playwright doesn&rsquo;t launch your Chrome app, it launches its own bundled Chromium binary and points it at that directory. Chromium and Chrome don&rsquo;t share a cookie store, so you get a fresh unauthenticated session no matter what path you pass.</p>
+<p>I tried this three different ways before I understood what was happening. The path was right the whole time. The binary was the problem.</p>
+<h2 id="the-actual-fix">The actual fix
+</h2><p>The Playwright MCP Bridge extension connects Playwright to your already-running Chrome over CDP. Same browser you use every day, same cookies, same sessions. Everything you&rsquo;re logged into just works.</p>
+<p><strong>Step 1: Install the extension</strong></p>
+<p>Search &ldquo;Playwright Extension&rdquo; in the Chrome Web Store. The ID is <code>mmlmfjhmonkocbjadbfplnigmagldckm</code> if you want to go directly.</p>
+<p><strong>Step 2: Store your token</strong></p>
+<p>Click the extension icon after installing. It gives you a token to set as an environment variable. Add it to <code>~/.zshrc</code> (or <code>~/.bashrc</code>):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>export PLAYWRIGHT_MCP_EXTENSION_TOKEN<span style="color:#f92672">=</span>your-token-here
+</span></span></code></pre></div><p>Then <code>source ~/.zshrc</code>. The token is unique to your installation, so copy it from the extension rather than using a placeholder.</p>
+<p><strong>Step 3: Use &ndash;extension instead of &ndash;profile</strong></p>
+<p>Chrome needs to already be running. Then:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>playwright-cli open --browser<span style="color:#f92672">=</span>chrome --extension --headed https://example.com
+</span></span></code></pre></div><p>That&rsquo;s it. Playwright connects to your running browser and your login state is there.</p>
+<h2 id="one-gotcha-the-token-resets-on-restart">One gotcha: the token resets on restart
+</h2><p>Every time Chrome restarts, the token changes. You&rsquo;ll see a dialog like this pop up in Chrome:</p>
+
+    <blockquote>
+        <p>&ldquo;playwright-cli is trying to connect to the Playwright Extension. Set this environment variable to bypass the connection dialog: PLAYWRIGHT_MCP_EXTENSION_TOKEN=&hellip;&rdquo;</p>
+
+    </blockquote>
+<p>Click &ldquo;Allow &amp; select&rdquo; on the tab you want, copy the new token value, update <code>~/.zshrc</code>. It&rsquo;s a one-time thing per Chrome session. The re-approval is intentional since the extension has full access to your browser including everything you&rsquo;re signed into.</p>
+<h2 id="using-this-for-web-research-in-claude-code">Using this for web research in Claude Code
+</h2><p>Once it&rsquo;s set up you can point Claude Code at ChatGPT, Gemini or Perplexity and have it do research there with your real session, rather than firing WebFetch at raw URLs and getting blocked.</p>
+<p>If you&rsquo;re using the <code>playwright-cli</code> skill in Claude Code, add this section to the top of your <code>~/.claude/skills/playwright-cli/SKILL.md</code> so Claude always knows to ask before opening a browser:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span><span style="color:#75715e">## Profile mode (use my real Chrome)
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="font-weight:bold">**Before opening a browser, if the user hasn&#39;t specified, always ask:**</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">&gt; </span><span style="font-style:italic">&#34;Should I use your Chrome profile (so you&#39;re logged in), or open a fresh browser?&#34;
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>If the user wants their profile:
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> Chrome must already be running — if not, tell the user to open it first
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> Always use <span style="color:#e6db74">`--browser=chrome --extension`</span> (never <span style="color:#e6db74">`--profile`</span>, it doesn&#39;t work)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> Always use <span style="color:#e6db74">`--headed`</span> so the browser is visible
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> The token is in the environment as <span style="color:#e6db74">`PLAYWRIGHT_MCP_EXTENSION_TOKEN`</span> — no need to pass it manually
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>```bash
+</span></span><span style="display:flex;"><span>playwright-cli open --browser=chrome --extension --headed https://example.com
+</span></span></code></pre></div><p>If connection times out, remind the user that Chrome needs to be open and the Playwright Extension must be installed (Chrome Web Store ID: <code>mmlmfjhmonkocbjadbfplnigmagldckm</code>).</p>
+<pre tabindex="0"><code></code></pre>
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/claude-code/">Claude-Code</a>
+        
+            <a href="/tags/mcp/">MCP</a>
+        
+            <a href="/tags/playwright/">Playwright</a>
+        
+            <a href="/tags/browser-automation/">Browser-Automation</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+
+        <div class="disqus-container">
+    
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Thomas Schneider&#39;s Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.1">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.1ff1e5fdc4e178ed422e50aa407526dc552f26342d729343fded19416194382c.js" defer></script>
+
+
+    </body>
+</html>

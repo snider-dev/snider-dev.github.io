@@ -30,3 +30,6 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+.playwright-cli
+content_pipeline
+CLAUDE.md

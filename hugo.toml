@@ -2,3 +2,37 @@ baseURL = 'https://snider-dev.github.io'
 locale = 'en-us'
 title = "Thomas Schneider's Blog"
 theme = 'stack'
+
+[params]
+    favicon = "img/avatar.png"
+
+[params.author]
+    name  = "Thomas Schneider"
+
+[params.sidebar]
+    subtitle = "Tech Lead at SAP AI. Building production-grade AI agent infrastructure."
+    avatar   = "img/avatar.png"
+
+[params.analytics.google]
+measurementId = "G-WLY3QYQN8M"
+
+[[menus.social]]
+    identifier = "github"
+    name       = "GitHub"
+    url        = "https://github.com/schthms"
+    [menus.social.params]
+        icon = "brand-github"
+
+[[menus.social]]
+    identifier = "twitter"
+    name       = "X"
+    url        = "https://x.com/sndr_tms"
+    [menus.social.params]
+        icon = "brand-twitter"
+
+[[menus.social]]
+    identifier = "linkedin"
+    name       = "LinkedIn"
+    url        = "https://www.linkedin.com/in/thomas-schneider-24769313b/"
+    [menus.social.params]
+        icon = "brand-linkedin"

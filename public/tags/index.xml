@@ -1,8 +1,33 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Tags on Thomas Schneider&#39;s Blog</title>
-        <link>http://localhost:1313/tags/</link>
+        <link>https://snider-dev.github.io/tags/</link>
         <description>Recent content in Tags on Thomas Schneider&#39;s Blog</description>
         <generator>Hugo -- gohugo.io</generator>
-        <language>en-us</language><atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" /></channel>
+        <language>en-us</language>
+        <lastBuildDate>Tue, 09 Jun 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://snider-dev.github.io/tags/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>Browser-Automation</title>
+            <link>https://snider-dev.github.io/tags/browser-automation/</link>
+            <pubDate>Tue, 09 Jun 2026 00:00:00 +0000</pubDate>
+            <guid>https://snider-dev.github.io/tags/browser-automation/</guid>
+            <description></description>
+        </item><item>
+            <title>Claude-Code</title>
+            <link>https://snider-dev.github.io/tags/claude-code/</link>
+            <pubDate>Tue, 09 Jun 2026 00:00:00 +0000</pubDate>
+            <guid>https://snider-dev.github.io/tags/claude-code/</guid>
+            <description></description>
+        </item><item>
+            <title>MCP</title>
+            <link>https://snider-dev.github.io/tags/mcp/</link>
+            <pubDate>Tue, 09 Jun 2026 00:00:00 +0000</pubDate>
+            <guid>https://snider-dev.github.io/tags/mcp/</guid>
+            <description></description>
+        </item><item>
+            <title>Playwright</title>
+            <link>https://snider-dev.github.io/tags/playwright/</link>
+            <pubDate>Tue, 09 Jun 2026 00:00:00 +0000</pubDate>
+            <guid>https://snider-dev.github.io/tags/playwright/</guid>
+            <description></description>
+        </item></channel>
 </rss>
